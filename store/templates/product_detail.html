@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ product.name }} - ShopSphere{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="product-detail">
+            <div class="product-detail-image">
+                {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                {% else %}
+                    <img src="{% static 'store/images/placeholder.svg' }}" alt="{{ product.name }}">
+                {% endif %}
+            </div>
+            <div class="product-detail-info">
+                <h1>{{ product.name }}</h1>
+                <p class="product-detail-price">${{ product.price }}</p>
+
+                {% if product.is_in_stock %}
+                    <p class="product-stock in-stock">&#10004; In Stock ({{ product.stock_quantity }} available)</p>
+                {% else %}
+                    <p class="product-stock out-stock">&#10006; Out of Stock</p>
+                {% endif %}
+
+                <p class="product-detail-description">{{ product.description|linebreaks }}</p>
+
+                <p class="product-category">Category:
+                    <a href="{% url 'products' %}?category={{ product.category.slug }}">{{ product.category.name }}</a>
+                </p>
+
+                {% if product.is_in_stock %}
+                    {% if user.is_authenticated %}
+                        <form class="add-to-cart-form" action="{% url 'add_to_cart' product.slug %}" method="POST">
+                            {% csrf_token %}
+                            <div class="quantity-selector">
+                                <label for="quantity">Quantity:</label>
+                                <input type="number" name="quantity" id="quantity" value="1" min="1" max="{{ product.stock_quantity }}">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Add to Cart</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ product.get_absolute_url }}" class="btn btn-primary">Login to Buy</a>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-disabled" disabled>Out of Stock</button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+{% if related_products %}
+<section class="section section-light">
+    <div class="container">
+        <h2 class="section-title">Related Products</h2>
+        <div class="product-grid">
+            {% for product in related_products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <img src="{% static 'store/images/placeholder.svg' }}" alt="{{ product.name }}">
+                        {% endif %}
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-title">
+                            <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                        </h3>
+                        <p class="product-price">${{ product.price }}</p>
+                        <a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm">View Details</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const qtyInput = document.getElementById('quantity');
+    if (qtyInput) {
+        qtyInput.addEventListener('change', function() {
+            const max = parseInt(this.max);
+            if (parseInt(this.value) > max) {
+                this.value = max;
+            }
+            if (parseInt(this.value) < 1) {
+                this.value = 1;
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

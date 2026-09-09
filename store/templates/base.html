@@ -1,0 +1,112 @@
+{% load static %}
+{% load store_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}ShopSphere{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'store/css/style.css' %}">
+</head>
+<body>
+    <!-- Header / Navbar -->
+    <header class="navbar">
+        <div class="container">
+            <div class="navbar-brand">
+                <a href="{% url 'home' %}">ShopSphere</a>
+            </div>
+
+            <nav class="navbar-nav" id="navbarNav">
+                <ul class="navbar-menu">
+                    <li><a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">Home</a></li>
+                    <li><a href="{% url 'products' %}" class="{% if request.resolver_match.url_name == 'products' or request.resolver_match.url_name == 'product_detail' %}active{% endif %}">Products</a></li>
+                    <li><a href="{% url 'cart_detail' %}" class="{% if request.resolver_match.url_name == 'checkout' or request.resolver_match.url_name == 'cart_detail' %}active{% endif %}">
+                        <span class="cart-link">
+                            Cart <span class="cart-count">({{ cart_item_count }})</span>
+                        </span>
+                    </a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'order_history' %}" class="{% if request.resolver_match.url_name == 'order_history' %}active{% endif %}">My Orders</a></li>
+                        <li class="nav-profile">
+                            <a href="#" class="profile-link">{{ user.username }}</a>
+                            <ul class="profile-dropdown">
+                                <li><a href="{% url 'logout' %}">Logout</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li><a href="{% url 'login' %}" class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">Login</a></li>
+                        <li><a href="{% url 'register' %}" class="{% if request.resolver_match.url_name == 'register' %}active{% endif %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="messages-container">
+            <div class="container">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}" data-message-id="{{ forloop.counter }}">
+                        <span class="message-text">{{ message }}</span>
+                        <button class="message-close" onclick="removeMessage(this)">&times;</button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Main content -->
+    <main class="main-content">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="{% url 'home' %}">ShopSphere</a>
+                    <p>Your one-stop shop for everything you need.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Shop</h4>
+                    <ul>
+                        <li><a href="{% url 'products' %}">All Products</a></li>
+                        <li><a href="{% url 'cart_detail' %}">Cart</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'order_history' %}">Order History</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="footer-links">
+                    <h4>Account</h4>
+                    <ul>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'logout' %}">Logout</a></li>
+                        {% else %}
+                        <li><a href="{% url 'login' %}">Login</a></li>
+                        <li><a href="{% url 'register' %}">Register</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 ShopSphere. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'store/js/main.js' %}"></script>
+    {% block extra_js %}
+    {% endblock %}
+</body>
+</html>

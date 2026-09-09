@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Products - ShopSphere{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="products-header">
+            <h1 class="page-title">All Products</h1>
+            <form class="search-form" method="GET" action="{% url 'products' %}">
+                <div class="search-box">
+                    <input type="search" name="q" placeholder="Search products..." value="{{ query }}">
+                    <button type="submit" class="search-btn">&#128269;</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="products-layout">
+            <aside class="sidebar">
+                <h3 class="sidebar-title">Categories</h3>
+                <ul class="category-list">
+                    <li>
+                        <a href="{% url 'products' %}" class="{% if not selected_category %}active{% endif %}">
+                            All Products
+                        </a>
+                    </li>
+                    {% for category in categories %}
+                        <li>
+                            <a href="{% url 'products' %}?category={{ category.slug }}"
+                               class="{% if selected_category.slug == category.slug %}active{% endif %}">
+                                {{ category.name }}
+                                <span class="count">({{ category.products.count }})</span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+
+            <div class="products-main">
+                {% if products %}
+                    <div class="product-grid">
+                        {% for product in products %}
+                            <div class="product-card">
+                                <div class="product-image">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                                    {% else %}
+                                        <img src="{% static 'store/images/placeholder.svg' }}" alt="{{ product.name }}">
+                                    {% endif %}
+                                    {% if not product.is_in_stock %}
+                                        <span class="badge badge-out-of-stock">Out of Stock</span>
+                                    {% else %}
+                                        <span class="badge badge-in-stock">In Stock</span>
+                                    {% endif %}
+                                </div>
+                                <div class="product-info">
+                                    <h3 class="product-title">
+                                        <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                                    </h3>
+                                    <p class="product-price">${{ product.price }}</p>
+                                    <p class="product-stock {% if product.is_in_stock %}in-stock{% else %}out-stock{% endif %}">
+                                        {% if product.is_in_stock %}
+                                            {{ product.stock_quantity }} items in stock
+                                        {% else %}
+                                            Out of stock
+                                        {% endif %}
+                                    </p>
+                                    <a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm">View Details</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No products found. Try a different search or category.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

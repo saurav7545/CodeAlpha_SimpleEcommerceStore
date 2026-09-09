@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}My Orders - ShopSphere{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="page-title">My Orders</h1>
+
+        {% if orders %}
+            <div class="orders-table-wrapper">
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Order #</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                            <tr>
+                                <td>#{{ order.id }}</td>
+                                <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                <td>${{ order.total_price }}</td>
+                                <td><span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span></td>
+                                <td>
+                                    {% for item in order.items.all %}
+                                        {{ item.quantity }}x                                         {% if item.product %}{{ item.product.name }}{% else %}Product{% endif %}{% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon">&#128722;</div>
+                <h2>No Orders Yet</h2>
+                <p>You haven't placed any orders yet.</p>
+                <a href="{% url 'products' %}" class="btn btn-primary">Start Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

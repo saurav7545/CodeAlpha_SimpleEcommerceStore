@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cart - ShopSphere{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <h1 class="page-title">Shopping Cart</h1>
+
+        {% if cart.items.exists %}
+            <div class="cart-table-wrapper">
+                <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart.items.select_related('product').all %}
+                            <tr class="cart-item" data-item-id="{{ item.id }}" data-stock="{{ item.product.stock_quantity }}">
+                                <td class="cart-product">
+                                    <div class="cart-product-info">
+                                        {% if item.product.image %}
+                                            <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                                        {% else %}
+                                            <img src="{% static 'store/images/placeholder.svg' }}" alt="{{ item.product.name }}">
+                                        {% endif %}
+                                        <a href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                                    </div>
+                                </td>
+                                <td class="cart-price">${{ item.product.price }}</td>
+                                <td class="cart-quantity">
+                                    <div class="quantity-controls">
+                                        <button type="button" class="qty-btn minus" data-item-id="{{ item.id }}" data-stock="{{ item.product.stock_quantity }}" data-price="{{ item.product.price }}">&minus;</button>
+                                        <input type="number" class="qty-input" value="{{ item.quantity }}" min="1" max="{{ item.product.stock_quantity }}" data-item-id="{{ item.id }}" data-price="{{ item.product.price }}" data-stock="{{ item.product.stock_quantity }}">
+                                        <button type="button" class="qty-btn plus" data-item-id="{{ item.id }}" data-stock="{{ item.product.stock_quantity }}" data-price="{{ item.product.price }}">+</button>
+                                    </div>
+                                </td>
+                                <td class="cart-item-total">
+                                    <span class="item-total">${{ item.get_total_price }}</span>
+                                </td>
+                                <td class="cart-remove">
+                                    <a href="{% url 'remove_from_cart' item.id %}" class="btn btn-secondary btn-sm" onclick="return confirmRemove()">Remove</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-summary">
+                <div class="cart-subtotal">
+                    <span>Subtotal:</span>
+                    <span>${{ cart.total_price }}</span>
+                </div>
+                <div class="cart-shipping">
+                    <span>Shipping:</span>
+                    <span>Free</span>
+                </div>
+                <div class="cart-grand-total">
+                    <span>Total:</span>
+                    <span>${{ cart.total_price }}</span>
+                </div>
+            </div>
+
+            <div class="cart-actions">
+                <a href="{% url 'products' %}" class="btn btn-secondary">Continue Shopping</a>
+                <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+            </div>
+        {% else %}
+            <div class="empty-cart">
+                <div class="empty-cart-icon">&#128722;</div>
+                <h2>Your Cart is Empty</h2>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <a href="{% url 'products' %}" class="btn btn-primary">Start Shopping</a>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - ShopSphere{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="auth-container">
+            <div class="auth-card">
+                <h1>Create Account</h1>
+                <p>Join us today and start shopping!</p>
+
+                <form method="POST" action="{% url 'register' %}" class="auth-form" id="registerForm">
+                    {% csrf_token %}
+                    {{ form.non_field_errors }}
+                    <div class="form-group">
+                        <label for="id_username">Username *</label>
+                        {{ form.username }}
+                        {{ form.username.errors }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email *</label>
+                        {{ form.email }}
+                        {{ form.email.errors }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password1">Password *</label>
+                        {{ form.password1 }}
+                        {{ form.password1.errors }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password2">Confirm Password *</label>
+                        {{ form.password2 }}
+                        {{ form.password2.errors }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <p class="auth-switch">
+                    Already have an account?
+                    <a href="{% url 'login' %}">Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

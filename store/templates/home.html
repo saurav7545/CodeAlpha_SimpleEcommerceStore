@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}ShopSphere - Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to ShopSphere</h1>
+        <p>Discover amazing products at unbeatable prices</p>
+        <a href="{% url 'products' %}" class="btn btn-primary">Shop Now</a>
+    </div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <h2 class="section-title">Featured Products</h2>
+        {% if featured_products %}
+            <div class="product-grid">
+                {% for product in featured_products %}
+                    <div class="product-card">
+                        <div class="product-image">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="{% static 'store/images/placeholder.svg' %}" alt="{{ product.name }}">
+                            {% endif %}
+                            {% if not product.is_in_stock %}
+                                <span class="badge badge-out-of-stock">Out of Stock</span>
+                            {% else %}
+                                <span class="badge badge-in-stock">In Stock</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <h3 class="product-title">
+                                <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                            </h3>
+                            <p class="product-price">${{ product.price }}</p>
+                            <a href="{{ product.get_absolute_url }}" class="btn btn-secondary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="no-products">No featured products available right now. Check back soon!</p>
+        {% endif %}
+    </div>
+</section>
+
+{% if categories %}
+<section class="section section-light">
+    <div class="container">
+        <h2 class="section-title">Shop by Category</h2>
+        <div class="category-grid">
+            {% for category in categories %}
+                <a href="{% url 'products' %}?category={{ category.slug }}" class="category-card">
+                    <div class="category-icon">
+                        {% if category.products.first.image %}
+                            <img src="{{ category.products.first.image.url }}" alt="{{ category.name }}">
+                        {% else %}
+                            <img src="{% static 'store/images/placeholder.svg' %}" alt="{{ category.name }}">
+                        {% endif %}
+                    </div>
+                    <h3>{{ category.name }}</h3>
+                    <span class="category-count">{{ category.products.count }} products</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+{% endblock %}
